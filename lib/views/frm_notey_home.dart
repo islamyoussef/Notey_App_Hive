@@ -19,61 +19,60 @@ class FrmNoteyHome extends StatefulWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight); // Set the preferred size
 }
 
-class _FrmNoteyHomeState extends State<FrmNoteyHome> {
+final _formKey = GlobalKey<FormState>();
 
+class _FrmNoteyHomeState extends State<FrmNoteyHome> {
   final TextEditingController _txtTitle = TextEditingController();
   final TextEditingController _txtDetails = TextEditingController();
   final noteBox = Hive.box(lVarNotesBox);
 
   List<Note> listOfNotes = [];
-  // [
-  //   Note(noteID: '1', noteTitle: 'Note Title 1', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '2', noteTitle: 'Note Title 2', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '3', noteTitle: 'Note Title 3', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '4', noteTitle: 'Note Title 4', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '5', noteTitle: 'Note Title 5', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '6', noteTitle: 'Note Title 6', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '7', noteTitle: 'Note Title 7', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '8', noteTitle: 'Note Title 8', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '9', noteTitle: 'Note Title 9', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  //   Note(noteID: '10', noteTitle: 'Note Title 10', noteDetails: 'Animating an Opacity widget directly causes the widget ', noteDate: DateTime.now(), noteColor: SharedMethods.getRandomColor()),
-  // ];
 
-  Future<void> _saveNote(Map<String, dynamic> note) async{
-    if(note['noteID'] == -1)
-    {
+  Future<void> _saveNote(Map<String, dynamic> note) async {
+    if (note['noteID'] == -1) {
       await noteBox.add(note);
-    }else {
+    } else {
       await noteBox.put(note['noteID'], note);
     }
   }
 
-  Future<void> _deleteNote(int noteID) async{
+  Future<void> _deleteNote(int noteID) async {
     await noteBox.delete(noteID);
     _selectNotes();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Note has been deleted.'),));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Note has been deleted.')));
   }
 
-  void _selectNotes(){
-    final allNotes = noteBox.keys.map((key){
-      final noteData = noteBox.get(key);
-      return {
-        //noteID, noteTitle, noteDetails, noteDate,noteColor
-        "noteID":key,
-        "noteTitle": noteData["noteTitle"],
-        "noteDetails": noteData["noteDetails"],
-        "noteDate": noteData["noteDate"],
-        "noteColor": noteData["noteColor"],
-      };
-    }).toList();
+  void _selectNotes() {
+    final allNotes =
+        noteBox.keys.map((key) {
+          final noteData = noteBox.get(key);
+          return {
+            //noteID, noteTitle, noteDetails, noteDate,noteColor
+            "noteID": key,
+            "noteTitle": noteData["noteTitle"],
+            "noteDetails": noteData["noteDetails"],
+            "noteDate": noteData["noteDate"],
+            "noteColor": noteData["noteColor"],
+          };
+        }).toList();
 
     setState(() {
       listOfNotes.clear();
-      var listOfNotesMap = allNotes.reversed.cast<Map<String, dynamic>>().toList() ;
-      for(var item in listOfNotesMap ){
-        listOfNotes.add(Note(noteID: item['noteID'], noteTitle: item['noteTitle'], noteDetails: item['noteDetails'], noteDate: item['noteDate'], noteColor: item['noteColor']));
+      var listOfNotesMap =
+          allNotes.reversed.cast<Map<String, dynamic>>().toList();
+      for (var item in listOfNotesMap) {
+        listOfNotes.add(
+          Note(
+            noteID: item['noteID'],
+            noteTitle: item['noteTitle'],
+            noteDetails: item['noteDetails'],
+            noteDate: item['noteDate'],
+            noteColor: item['noteColor'],
+          ),
+        );
       }
     });
 
@@ -101,8 +100,14 @@ class _FrmNoteyHomeState extends State<FrmNoteyHome> {
     return Scaffold(
       body: Column(
         children: [
-          CustAppBar(title: 'Notes App',icon: Icons.search_rounded,onClick: (){}),
+          // →→→→→→→→→→→→→ Appbar
+          CustAppBar(
+            title: 'Notes App',
+            icon: Icons.search_rounded,
+            onClick: () {},
+          ),
 
+          // →→→→→→→→→→→→→ List of cards
           Expanded(
             child: ListView.builder(
               itemCount: listOfNotes.length,
@@ -112,14 +117,15 @@ class _FrmNoteyHomeState extends State<FrmNoteyHome> {
                   title: listOfNotes[index].noteTitle,
                   details: listOfNotes[index].noteDetails,
                   cardDate: listOfNotes[index].noteDate.toString(),
-                  openModalSheet: (){
+                  openModalSheet: () {
                     _txtTitle.text = listOfNotes[index].noteTitle;
                     _txtDetails.text = listOfNotes[index].noteDetails;
                     openModalBottomSheet(listOfNotes[index]);
                   },
-                  onDeleteClick: (){
+                  onDeleteClick: () {
+                    // Delete Note
                     _deleteNote(listOfNotes[index].noteID);
-                },
+                  },
                 );
               },
             ),
@@ -131,13 +137,16 @@ class _FrmNoteyHomeState extends State<FrmNoteyHome> {
         onPressed: () {
           _txtTitle.text = '';
           _txtDetails.text = '';
-          openModalBottomSheet(Note(
+          openModalBottomSheet(
+            Note(
               noteID: -1,
               noteTitle: 'Insert Title',
               noteDetails: 'Insert Details',
               noteDate: DateTime.now(),
-              noteColor:SharedMethods.getRandomColor() ));
-          },
+              noteColor: SharedMethods.getRandomColor(),
+            ),
+          );
+        },
         backgroundColor: lVarMainColor,
         foregroundColor: Colors.black,
         tooltip: 'Add New',
@@ -146,24 +155,15 @@ class _FrmNoteyHomeState extends State<FrmNoteyHome> {
     );
   }
 
-  Future openModalBottomSheet(Note selectedNote){
+  Future openModalBottomSheet(Note selectedNote) {
     return showModalBottomSheet(
       context: context,
-      builder: (context)
-      {
+      builder: (context) {
         return Container(
-          padding: EdgeInsets.only(
-            top: 16,
-            bottom: 16,
-            right: 26,
-            left: 26,
-          ),
+          padding: EdgeInsets.only(top: 16, bottom: 16, right: 26, left: 26),
           child: Column(
             children: [
-              CustText(
-                  txtController: _txtTitle,
-                  txtHint: 'Insert title'
-              ) ,
+              CustText(txtController: _txtTitle, txtHint: 'Insert title'),
 
               CustText(
                 txtController: _txtDetails,
@@ -172,19 +172,31 @@ class _FrmNoteyHomeState extends State<FrmNoteyHome> {
               ),
 
               ElevatedButton(
-                onPressed:() {
+                onPressed: () {
 
-                 Map<String, dynamic> noteData = {
-                   //noteID
-                   'noteID':selectedNote.noteID,
-                   'noteTitle': _txtTitle.text.trim(),
-                   'noteDetails': _txtDetails.text.trim(),
-                   'noteDate': DateTime.now(),
-                   'noteColor': selectedNote.noteColor
-                 };
+                  // _formKey.currentState!.validate();
+                  //
+                  // log(_formKey.currentState!.validate().toString());
+                  // If the form is valid, display a snackbar.
+                  // if (_formKey.currentState.toString()) {
+                  //   ScaffoldMessenger.of(context).showSnackBar(
+                  //     const SnackBar(content: Text('Processing Data')),
+                  //   );
+                  // } else {
+                  //
+                  // }
 
-                  _saveNote(noteData);
+                  Map<String, dynamic> noteData = {
+                    //noteID
+                    'noteID': selectedNote.noteID,
+                    'noteTitle': _txtTitle.text.trim(),
+                    'noteDetails': _txtDetails.text.trim(),
+                    'noteDate': DateTime.now(),
+                    'noteColor': selectedNote.noteColor,
+                  };
+
                   //print(noteData['noteID']);
+                  _saveNote(noteData);
 
                   // Refresh
                   _selectNotes();
@@ -196,17 +208,12 @@ class _FrmNoteyHomeState extends State<FrmNoteyHome> {
                   backgroundColor: lVarListOfColors[selectedNote.noteColor],
                   minimumSize: Size(double.infinity, 50),
                 ),
-                child: Text(
-                  'Save',
-                  style: TextStyle(color: Colors.black),
-                ),
+                child: Text('Save', style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
         );
-
       },
     );
   }
-
 }

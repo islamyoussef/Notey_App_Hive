@@ -1,8 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../../ihelper/local_vars.dart';
 
-class CustText extends StatefulWidget {
+class CustText extends StatelessWidget {
   const CustText({super.key, required this.txtController, required this.txtHint, this.maxLine = 1});
 
   final TextEditingController txtController;
@@ -10,34 +12,37 @@ class CustText extends StatefulWidget {
   final int maxLine;
 
   @override
-  State<CustText> createState() => _CustTextState();
-}
-
-class _CustTextState extends State<CustText> {
-  @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
-      child: TextField(
-        controller: widget.txtController,
+      child: TextFormField(
+        controller: txtController,
+        maxLines: maxLine,
+        //autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: (inputVal){
+          if (inputVal?.isEmpty ?? true) {
+            return 'Please enter some text';
+          }
+          print(inputVal.toString());
+          return null;
+        },
 
-        maxLines: widget.maxLine,
+        // → Input border decoration
         decoration: InputDecoration(
-          hintText: widget.txtHint,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: lVarMainColor),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.redAccent),
-          ),
+          hintText: txtHint,
+          //errorText: 'Please insert value',
+          border: _borderStates(Colors.white),
+          focusedBorder: _borderStates(Colors.greenAccent),
+          errorBorder: _borderStates(Colors.redAccent),
         ),
       ),
+    );
+  }
+
+  OutlineInputBorder _borderStates(Color borderColor){
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: borderColor),
     );
   }
 }
