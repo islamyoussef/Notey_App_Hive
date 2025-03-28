@@ -1,10 +1,9 @@
 
 import 'package:flutter/material.dart';
 
-const String lVarNotesBox = 'HiveBox_Note';
-
 const Color lVarMainColor = Colors.orangeAccent;
 
+// palette
 const List<Color> lVarListOfColors = [
   Colors.pinkAccent,
   Colors.lightBlueAccent,

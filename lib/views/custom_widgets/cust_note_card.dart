@@ -37,9 +37,11 @@ class CustNoteCard extends StatelessWidget {
                 title,
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
+                  overflow: TextOverflow.ellipsis
                 ),
+                maxLines: 2,
               ),
             ),
             subtitle: Text(
